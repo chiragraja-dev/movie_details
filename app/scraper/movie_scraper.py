@@ -23,9 +23,9 @@ class MovieScraper:
         return None
 
    
-    def fetch_movie_dltby_id(movie_id, page_no=1):
+    def fetch_movie_dltby_id(self,movie_id, page_no=1):
         url = f"{tmdb_baseurl}/movie/{movie_id}"
-
+        
         params = {
             'api_key': tmdb_auth,
             'language': 'en-US',
@@ -34,7 +34,6 @@ class MovieScraper:
         response = requests.get(url, params=params)
         if response.status_code == 200:
             results = response.json()
-            print(response.json())
             return results
         else:
             print("Failed to fetch movie:", response.status_code, response.text)
@@ -90,23 +89,21 @@ class MovieScraper:
             print("Failed to fetch data:", response.status_code)
 
 
-    def fetch_movie_cast(movie_id):
+    def fetch_movie_cast(self, movie_id):
         url = f"{tmdb_baseurl}/movie/{movie_id}/credits"
         params = {
             'api_key': tmdb_auth,
             'language': 'en-US'
         }
-
         response = requests.get(url, params=params)
         if response.status_code == 200:
             results = response.json()
-            print(response.json())
             return results
         else:
             print("Failed to fetch movie:", response.status_code, response.text)
 
 
-    def fetch_movie_videos(movie_id):
+    def fetch_movie_videos(self,movie_id):
         url = f"{tmdb_baseurl}/movie/{movie_id}/videos"
         params = {
             'api_key': tmdb_auth,
@@ -115,7 +112,6 @@ class MovieScraper:
         response = requests.get(url, params=params)
         if response.status_code == 200:
             results = response.json()
-            print(response.json())
             return results
         else:
             print("Failed to fetch movie:", response.status_code, response.text)

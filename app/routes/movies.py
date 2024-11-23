@@ -1,5 +1,5 @@
 from flask import Blueprint, request,jsonify
-from app.services.movies_services import add_movie,add_details
+from app.services.movies_services import add_movie,add_details,get_movies,get_details, get_movie_cast
 
 movies_bp = Blueprint('movies', __name__)
 @movies_bp.route('/add-movie', methods=['POST'])
@@ -19,5 +19,14 @@ def add_movie_details():
     result = add_details()
     return result
 
-
+@movies_bp.route('/get-movies', methods=["GET"])
+def get_movies_list():
+    return get_movies() 
     
+@movies_bp.route('/get-movie-details', methods=["GET"])
+def get_movies_details():
+    return get_details() 
+
+@movies_bp.route('/get-movie-cast', methods=["GET"])
+def get_movies_cast():
+    return get_movie_cast() 
