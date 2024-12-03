@@ -5,16 +5,6 @@ from datetime import datetime
 from bson.json_util import dumps, loads
 from flask import request,jsonify  
 from bson import ObjectId
-# def objectid_to_str(obj):
-#     if isinstance(obj, ObjectId):
-#         return str(obj)
-#     elif isinstance(obj, dict):
-#         return {k: objectid_to_str(v) for k, v in obj.items()}
-#     elif isinstance(obj, list):
-#         return [objectid_to_str(i) for i in obj]
-#     else:
-#         return obj
-
 
 def add_movie(filter_type):
     try:
@@ -87,6 +77,10 @@ def convert_objectid(data):
     else:
         return data
 
+        
+def convert_objectid_for_id(data):
+    return [{**doc, "_id": str(doc["_id"])} for doc in data]
+
 def get_details():
     try:
         db = get_db()
@@ -151,4 +145,54 @@ def add_movie_video(id):
             movie_video_dict= result
         insert_result = db.movie_video.insert_one(movie_video_dict)
         print("data added")
+
+def get_movie_with_id():
+    try:
+        db = get_db()
+        id = request.args.get('id',1,type=int)
+        data = db.movies.find_one({"id":id})
+        movies_list =convert_objectid(data)
+        return {"status":200, "message":movies_list}
+    except Exception as e:
+        return {"status":500,"message":"Internal server error","details": str(e)}
+
+def get_movies_by_type():
+    try:
+        db = get_db()
+        movie_type = request.args.get('type',  default="now_playing", type=str)
+        page = request.args.get('page',default=1, type=int)
+        if page > 1:
+             return {"status":400, "message":"Page number can't be zero or negative"}
+        movie_type = movie_type.strip().lower()
+        data_types = ["now_playing","upcoming","top_rated","popular"]
+      
+        if movie_type in data_types:
+            page_size = 40
+            skip_count= (page-1) * page_size
+            data = db.movies.find({"filter_type":movie_type}).skip(skip_count).limit(page_size).sort([("_id",1)])
+
+            total_count = db.movies.count_documents({"filter_type":movie_type})
+
+            total_pages = (total_count + page_size -1)//page_size
+
+            movies_list = convert_objectid_for_id(data)
+            return {
+                "status":200,
+                "data":movies_list,
+                "pagination": {
+                "current_page": page,
+                "total_pages": total_pages,
+                "total_items": total_count,
+                "page_page_size": page_size
+            }
+                 }
+        else:
+            return {"status":400, "message":"wrong parameter"}
+        
+    except Exception as e:
+        return {"status":500,"message":"Internal server error","details": str(e)}
+
+
+# def search_movies
+
 
