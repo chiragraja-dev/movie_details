@@ -76,8 +76,7 @@ def convert_objectid(data):
         return str(data)
     else:
         return data
-
-        
+       
 def convert_objectid_for_id(data):
     return [{**doc, "_id": str(doc["_id"])} for doc in data]
 
@@ -193,6 +192,13 @@ def get_movies_by_type():
         return {"status":500,"message":"Internal server error","details": str(e)}
 
 
-# def search_movies
-
+def get_video():
+    try:
+        db = get_db()
+        id = request.args.get('id',1,type=int)
+        data = db.movie_video.find_one({"id":id})
+        movie_video =convert_objectid(data)
+        return {"status":200, "message":movie_video}
+    except Exception as e:
+        return {"status":500,"message":"Internal server error","details": str(e)}
 
